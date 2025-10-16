@@ -5,10 +5,13 @@ describe('App Basic Tests', () => {
   it('deve retornar status da API na rota raiz', async () => {
     const response = await request(app)
       .get('/')
+      .set('Accept', 'application/json')
       .expect(200);
 
     expect(response.body).toHaveProperty('status');
-    expect(response.body.status).toBe('Instituição Financeira API rodando');
+    expect(response.body.status).toBe('✅ Online');
+    expect(response.body).toHaveProperty('name');
+    expect(response.body.name).toBe('Arthur Financial Institution API');
   });
 
   it('deve retornar 404 para rotas não existentes', async () => {

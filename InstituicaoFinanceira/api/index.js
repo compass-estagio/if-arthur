@@ -1,3 +1,2 @@
 // Este arquivo é o ponto de entrada para as funções serverless do Vercel
-module.exports = require('./src/server.js');
-
+module.exports = require('../src/server.js');
