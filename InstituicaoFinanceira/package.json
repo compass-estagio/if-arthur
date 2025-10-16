@@ -17,7 +17,7 @@
     "coverageDirectory": "coverage"
   },
   "engines": {
-    "node": "22.x"
+    "node": "18.x"
   },
   "keywords": [],
   "author": "",
