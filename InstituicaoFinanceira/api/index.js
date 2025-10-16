@@ -1,2 +1,5 @@
 // Este arquivo é o ponto de entrada para as funções serverless do Vercel
-module.exports = require('../src/app.js');
+const app = require('../src/app.js');
+
+// Para Vercel, precisamos exportar como uma função handler
+module.exports = app;
