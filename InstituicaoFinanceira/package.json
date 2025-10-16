@@ -1,18 +1,22 @@
 {
   "name": "instituicaofinanceira",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Instituição Financeira API para Open Finance - Fase 2",
+  "main": "src/server.js",
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
+    "dev": "nodemon src/server.js",
+    "vercel-build": "echo 'Build completed'"
   },
   "jest": {
     "testEnvironment": "node",
     "collectCoverage": true,
     "coverageDirectory": "coverage"
+  },
+  "engines": {
+    "node": "18.x"
   },
   "keywords": [],
   "author": "",
