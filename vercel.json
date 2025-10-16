@@ -1,11 +1,10 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "InstituicaoFinanceira/api/index.js",
-      "use": "@vercel/node"
+  "functions": {
+    "InstituicaoFinanceira/api/index.js": {
+      "runtime": "@vercel/node"
     }
-  ],
+  },
   "routes": [
     {
       "src": "/(.*)",
@@ -13,4 +12,3 @@
     }
   ]
 }
-
