@@ -1,5 +1,5 @@
 const request = require('supertest');
-const app = require('../src/app');
+const app = require('../api/app');
 
 describe('App Basic Tests', () => {
   it('deve retornar status da API na rota raiz', async () => {

@@ -1,12 +1,12 @@
 const request = require('supertest');
-const app = require('../src/app');
+const app = require('../api/app');
 
 describe('Integration Tests - Complete Flow', () => {
   beforeEach(() => {
     // Limpar todos os dados entre testes
-    const customers = require('../src/models/customer');
-    const accounts = require('../src/models/account');
-    const transactions = require('../src/models/transaction');
+    const customers = require('../api/models/customer');
+    const accounts = require('../api/models/account');
+    const transactions = require('../api/models/transaction');
     customers.length = 0;
     accounts.length = 0;
     transactions.length = 0;
@@ -131,8 +131,8 @@ describe('Integration Tests - Complete Flow', () => {
     expect(statementResponse.body[2].description).toBe('Transferência recebida');
 
     // Verificar que as transações estão vinculadas à conta
-    const customers = require('../src/models/customer');
-    const accounts = require('../src/models/account');
+    const customers = require('../api/models/customer');
+    const accounts = require('../api/models/account');
 
     const customer = customers.find(c => c._id === customerResponse.body._id);
     const account = accounts.find(a => a._id === accountResponse.body._id);

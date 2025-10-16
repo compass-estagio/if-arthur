@@ -1,5 +1,5 @@
 const request = require('supertest');
-const app = require('../src/app');
+const app = require('../api/app');
 
 describe('Transactions API', () => {
   let customerId, accountId;
@@ -17,9 +17,9 @@ describe('Transactions API', () => {
 
   beforeEach(async () => {
     // Limpar dados entre testes
-    const customers = require('../src/models/customer');
-    const accounts = require('../src/models/account');
-    const transactions = require('../src/models/transaction');
+    const customers = require('../api/models/customer');
+    const accounts = require('../api/models/account');
+    const transactions = require('../api/models/transaction');
     customers.length = 0;
     accounts.length = 0;
     transactions.length = 0;
@@ -229,7 +229,7 @@ describe('Transactions API', () => {
         .send(transactionWithAccount)
         .expect(201);
 
-      const accounts = require('../src/models/account');
+      const accounts = require('../api/models/account');
       const account = accounts.find(a => a._id === accountId);
 
       expect(account.transactions).toContain(transactionResponse.body._id);
