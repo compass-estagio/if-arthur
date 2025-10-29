@@ -1,5 +1,7 @@
 {
   "version": 2,
+  "buildCommand": "cd InstituicaoFinanceira && npm install",
+  "installCommand": "cd InstituicaoFinanceira && npm install",
   "builds": [
     {
       "src": "InstituicaoFinanceira/api/index.js",
