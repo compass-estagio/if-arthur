@@ -1,0 +1,10 @@
+{
+  "name": "if-arthur-root",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "postinstall": "cd InstituicaoFinanceira && npm install",
+    "build": "echo 'Build completed'",
+    "vercel-build": "cd InstituicaoFinanceira && npm install"
+  }
+}
