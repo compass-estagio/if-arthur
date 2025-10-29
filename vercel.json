@@ -2,11 +2,13 @@
   "version": 2,
   "builds": [
     {
-      "src": "InstituicaoFinanceira/api/index.js",
+      "src": "api/index.js",
       "use": "@vercel/node",
       "config": {
         "includeFiles": [
-          "InstituicaoFinanceira/**"
+          "api/**",
+          "config/**",
+          "database/**"
         ]
       }
     }
@@ -14,7 +16,7 @@
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/InstituicaoFinanceira/api/index.js"
+      "dest": "/api/index.js"
     }
   ]
 }

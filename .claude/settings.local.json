@@ -12,7 +12,10 @@
       "Bash(git commit:*)",
       "Bash(git push)",
       "Bash(NODE_ENV=test npm test:*)",
-      "Bash(set NODE_ENV=test)"
+      "Bash(set NODE_ENV=test)",
+      "Read(//c/Users/Arthur/Documents/GitHub/if-arthur/**)",
+      "Bash(git push:*)",
+      "Bash(git mv:*)"
     ],
     "deny": [],
     "ask": []
