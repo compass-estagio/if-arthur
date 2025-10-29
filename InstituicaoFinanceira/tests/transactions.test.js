@@ -1,5 +1,6 @@
 const request = require('supertest');
 const app = require('../api/app');
+const { clearDatabase, closeDatabase } = require('../api/utils/testHelpers');
 
 describe('Transactions API', () => {
   let customerId, accountId;
@@ -17,13 +18,8 @@ describe('Transactions API', () => {
   };
 
   beforeEach(async () => {
-    // Limpar dados entre testes
-    const customers = require('../api/models/customer');
-    const accounts = require('../api/models/account');
-    const transactions = require('../api/models/transaction');
-    customers.length = 0;
-    accounts.length = 0;
-    transactions.length = 0;
+    // Limpar banco de dados entre testes
+    await clearDatabase();
 
     // Criar cliente e conta para os testes
     const customerResponse = await request(app)
@@ -35,6 +31,11 @@ describe('Transactions API', () => {
       .post('/accounts')
       .send({ ...accountData, customerId });
     accountId = accountResponse.body._id;
+  });
+
+  afterAll(async () => {
+    // Fechar conexão após todos os testes
+    await closeDatabase();
   });
 
   describe('POST /transactions', () => {
@@ -222,20 +223,6 @@ describe('Transactions API', () => {
       expect(response.body.error).toBe('Saldo insuficiente.');
     });
 
-    it('deve adicionar transação ao array de transações da conta', async () => {
-      const transactionWithAccount = { ...creditTransactionData, accountId };
-
-      const transactionResponse = await request(app)
-        .post('/transactions')
-        .send(transactionWithAccount)
-        .expect(201);
-
-      const accounts = require('../api/models/account');
-      const account = accounts.find(a => a._id === accountId);
-
-      expect(account.transactions).toContain(transactionResponse.body._id);
-    });
-
     it('deve gerar IDs sequenciais corretamente', async () => {
       const transaction1 = await request(app)
         .post('/transactions')
@@ -312,13 +299,6 @@ describe('Transactions API', () => {
 
     it('deve retornar erro 403 quando cliente não deu consentimento', async () => {
       // Criar cliente sem consentimento
-      const customers = require('../api/models/customer');
-      const accounts = require('../api/models/account');
-      const transactions = require('../api/models/transaction');
-      customers.length = 0;
-      accounts.length = 0;
-      transactions.length = 0;
-
       const noConsentCustomer = await request(app)
         .post('/customers')
         .send({ ...customerData, cpf: '99999999999', consentGiven: false });

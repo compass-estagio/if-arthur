@@ -1,11 +1,21 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+require('dotenv').config();
+
+// Inicializar conexão com banco de dados
+const { testConnection } = require('../config/db');
+const models = require('./models'); // Carregar models e relacionamentos
 
 const customersRouter = require('./routes/customers');
 const accountsRouter = require('./routes/accounts');
 const transactionsRouter = require('./routes/transactions');
 
 const app = express();
+
+// Testar conexão com banco (apenas em desenvolvimento/produção, não em testes)
+if (process.env.NODE_ENV !== 'test') {
+  testConnection();
+}
 
 app.use(bodyParser.json());
 

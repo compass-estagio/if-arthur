@@ -1,5 +1,6 @@
 const request = require('supertest');
 const app = require('../api/app');
+const { clearDatabase, closeDatabase } = require('../api/utils/testHelpers');
 
 describe('Customers API', () => {
   let customerData = {
@@ -9,10 +10,14 @@ describe('Customers API', () => {
     consentGiven: true
   };
 
-  beforeEach(() => {
-    // Limpar dados entre testes
-    const customers = require('../api/models/customer');
-    customers.length = 0;
+  beforeEach(async () => {
+    // Limpar banco de dados entre testes
+    await clearDatabase();
+  });
+
+  afterAll(async () => {
+    // Fechar conexão após todos os testes
+    await closeDatabase();
   });
 
   describe('POST /customers', () => {

@@ -8,7 +8,11 @@
       "Bash(ren:*)",
       "Bash(npm run db:migrate:*)",
       "Bash(node test-db.js:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push)",
+      "Bash(NODE_ENV=test npm test:*)",
+      "Bash(set NODE_ENV=test)"
     ],
     "deny": [],
     "ask": []
