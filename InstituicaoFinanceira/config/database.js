@@ -30,7 +30,7 @@ module.exports = {
     logging: false // Não mostrar queries nos testes
   },
   production: {
-    url: process.env.DATABASE_URL,
+    url: process.env.teste_POSTGRES_URL || process.env.DATABASE_URL,
     dialect: 'postgres',
     dialectOptions: {
       ssl: {
