@@ -12,7 +12,8 @@ const validateConsent = async (req, res, next) => {
     const account = await Account.findByPk(accountId, {
       include: [{
         model: Customer,
-        as: 'customer'
+        as: 'customer',
+        required: false // Não falhar se não houver customer
       }]
     });
 

@@ -1,7 +1,18 @@
 const request = require('supertest');
 const app = require('../api/app');
+const { clearDatabase, closeDatabase } = require('../api/utils/testHelpers');
 
 describe('App Basic Tests', () => {
+  beforeEach(async () => {
+    // Limpar banco de dados entre testes
+    await clearDatabase();
+  });
+
+  afterAll(async () => {
+    // Fechar conexão após todos os testes
+    await closeDatabase();
+  });
+
   it('deve retornar status da API na rota raiz', async () => {
     const response = await request(app)
       .get('/')

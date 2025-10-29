@@ -100,7 +100,7 @@ router.get('/:accountId', validateConsent, async (req, res) => {
     // Buscar todas as transações da conta
     const accountTransactions = await Transaction.findAll({
       where: { accountId },
-      order: [['createdAt', 'ASC']] // Ordenar por data de criação
+      order: [['created_at', 'ASC']] // Ordenar por data de criação
     });
 
     // Retornar no formato esperado pelos testes

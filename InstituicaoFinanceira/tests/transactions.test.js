@@ -307,7 +307,7 @@ describe('Transactions API', () => {
 
       const noConsentAccount = await request(app)
         .post('/accounts')
-        .send({ ...accountData, customerId: noConsentCustomerId });
+        .send({ ...accountData, customerId: noConsentCustomerId, number: '99999-9' });
 
       const noConsentAccountId = noConsentAccount.body._id;
 

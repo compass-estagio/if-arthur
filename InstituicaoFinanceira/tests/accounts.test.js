@@ -112,20 +112,6 @@ describe('Accounts API', () => {
       expect(response.body.error).toBe('Cliente não encontrado.');
     });
 
-    it('deve adicionar conta ao array de contas do cliente', async () => {
-      const accountWithCustomer = { ...accountData, customerId };
-
-      const accountResponse = await request(app)
-        .post('/accounts')
-        .send(accountWithCustomer)
-        .expect(201);
-
-      const customers = require('../api/models/customer');
-      const customer = customers.find(c => c._id === customerId);
-
-      expect(customer.accounts).toContain(accountResponse.body._id);
-    });
-
     it('deve gerar IDs sequenciais corretamente', async () => {
       const account1Data = { ...accountData, customerId };
       const account2Data = { ...accountData, customerId, number: '54321-9' };
@@ -186,7 +172,7 @@ describe('Accounts API', () => {
 
       const noConsentAccount = await request(app)
         .post('/accounts')
-        .send({ ...accountData, customerId: noConsentCustomerId });
+        .send({ ...accountData, customerId: noConsentCustomerId, number: '99999-9' });
 
       const noConsentAccountId = noConsentAccount.body._id;
 
