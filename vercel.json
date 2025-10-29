@@ -1,4 +1,9 @@
 {
+  "functions": {
+    "api/**/*.js": {
+      "includeFiles": "{node_modules/pg/**,node_modules/pg-*/**}"
+    }
+  },
   "rewrites": [
     {
       "source": "/",
