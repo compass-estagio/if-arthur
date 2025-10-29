@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const accounts = require('../models/account');
 const transactions = require('../models/transaction');
+const { validateConsent } = require('../middleware/consentValidation');
 
 // Realizar transação (crédito ou débito)
 router.post('/', (req, res) => {
@@ -39,7 +40,8 @@ router.post('/', (req, res) => {
 });
 
 // Listar transações (extrato) por conta
-router.get('/:accountId', (req, res) => {
+// Middleware de validação de consentimento aplicado
+router.get('/:accountId', validateConsent, (req, res) => {
   const { accountId } = req.params;
   const account = accounts.find(a => a._id === accountId);
   if (!account) {

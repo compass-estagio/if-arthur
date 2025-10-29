@@ -5,7 +5,8 @@ describe('Customers API', () => {
   let customerData = {
     name: 'Maria Silva',
     cpf: '12345678900',
-    email: 'maria.silva@email.com'
+    email: 'maria.silva@email.com',
+    consentGiven: true
   };
 
   beforeEach(() => {
@@ -79,7 +80,8 @@ describe('Customers API', () => {
       const duplicateData = {
         name: 'João Santos',
         cpf: customerData.cpf,
-        email: 'joao.santos@email.com'
+        email: 'joao.santos@email.com',
+        consentGiven: true
       };
 
       const response = await request(app)
@@ -100,7 +102,8 @@ describe('Customers API', () => {
       const customer2Data = {
         name: 'João Santos',
         cpf: '09876543211',
-        email: 'joao.santos@email.com'
+        email: 'joao.santos@email.com',
+        consentGiven: true
       };
 
       const customer2 = await request(app)
@@ -110,6 +113,37 @@ describe('Customers API', () => {
 
       expect(customer1.body._id).toBe('cus_001');
       expect(customer2.body._id).toBe('cus_002');
+    });
+
+    it('deve retornar erro 400 quando consentGiven está ausente', async () => {
+      const invalidData = { ...customerData };
+      delete invalidData.consentGiven;
+
+      const response = await request(app)
+        .post('/customers')
+        .send(invalidData)
+        .expect(400);
+
+      expect(response.body).toHaveProperty('error');
+      expect(response.body.error).toBe('O campo consentGiven é obrigatório (true/false).');
+    });
+
+    it('deve criar cliente com consentGiven true', async () => {
+      const response = await request(app)
+        .post('/customers')
+        .send({ ...customerData, consentGiven: true })
+        .expect(201);
+
+      expect(response.body.consentGiven).toBe(true);
+    });
+
+    it('deve criar cliente com consentGiven false', async () => {
+      const response = await request(app)
+        .post('/customers')
+        .send({ ...customerData, consentGiven: false })
+        .expect(201);
+
+      expect(response.body.consentGiven).toBe(false);
     });
   });
 });

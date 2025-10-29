@@ -27,7 +27,8 @@ describe('App Basic Tests', () => {
       .send({
         name: 'Teste JSON',
         cpf: '12345678900',
-        email: 'teste@email.com'
+        email: 'teste@email.com',
+        consentGiven: true
       })
       .expect(201);
 

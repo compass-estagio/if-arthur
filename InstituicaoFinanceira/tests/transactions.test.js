@@ -6,7 +6,8 @@ describe('Transactions API', () => {
   let customerData = {
     name: 'Maria Silva',
     cpf: '12345678900',
-    email: 'maria.silva@email.com'
+    email: 'maria.silva@email.com',
+    consentGiven: true
   };
 
   let accountData = {
@@ -307,6 +308,35 @@ describe('Transactions API', () => {
 
       expect(Array.isArray(response.body)).toBe(true);
       expect(response.body).toHaveLength(0);
+    });
+
+    it('deve retornar erro 403 quando cliente não deu consentimento', async () => {
+      // Criar cliente sem consentimento
+      const customers = require('../api/models/customer');
+      const accounts = require('../api/models/account');
+      const transactions = require('../api/models/transaction');
+      customers.length = 0;
+      accounts.length = 0;
+      transactions.length = 0;
+
+      const noConsentCustomer = await request(app)
+        .post('/customers')
+        .send({ ...customerData, cpf: '99999999999', consentGiven: false });
+
+      const noConsentCustomerId = noConsentCustomer.body._id;
+
+      const noConsentAccount = await request(app)
+        .post('/accounts')
+        .send({ ...accountData, customerId: noConsentCustomerId });
+
+      const noConsentAccountId = noConsentAccount.body._id;
+
+      const response = await request(app)
+        .get(`/transactions/${noConsentAccountId}`)
+        .expect(403);
+
+      expect(response.body).toHaveProperty('error');
+      expect(response.body.error).toContain('consentimento');
     });
   });
 });

@@ -51,6 +51,18 @@ pids
 # dotenv environment variables file
 .env
 .env.test
+.env.local
+.env.production
+
+# Database
+*.sqlite
+*.sqlite3
+*.db
+
+# Backup files
+*.old.js
+*.backup
+*.bak
 
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test

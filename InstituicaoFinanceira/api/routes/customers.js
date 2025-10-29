@@ -3,9 +3,12 @@ const router = express.Router();
 const customers = require('../models/customer');
 
 router.post('/', (req, res) => {
-  const { name, cpf, email } = req.body;
+  const { name, cpf, email, consentGiven } = req.body;
   if (!name || !cpf || !email) {
     return res.status(400).json({ error: 'Nome, CPF e email são obrigatórios.' });
+  }
+  if (consentGiven === undefined) {
+    return res.status(400).json({ error: 'O campo consentGiven é obrigatório (true/false).' });
   }
   if (customers.find(c => c.cpf === cpf)) {
     return res.status(409).json({ error: 'Cliente com este CPF já existe.' });
@@ -15,6 +18,7 @@ router.post('/', (req, res) => {
     name,
     cpf,
     email,
+    consentGiven: Boolean(consentGiven),
     accounts: []
   };
   customers.push(newCustomer);

@@ -17,7 +17,8 @@ describe('Integration Tests - Complete Flow', () => {
     const customerData = {
       name: 'João Silva',
       cpf: '12345678900',
-      email: 'joao.silva@email.com'
+      email: 'joao.silva@email.com',
+      consentGiven: true
     };
 
     const customerResponse = await request(app)
@@ -148,7 +149,8 @@ describe('Integration Tests - Complete Flow', () => {
       .send({
         name: 'Maria Santos',
         cpf: '98765432100',
-        email: 'maria.santos@email.com'
+        email: 'maria.santos@email.com',
+        consentGiven: true
       });
 
     const account = await request(app)
@@ -189,7 +191,8 @@ describe('Integration Tests - Complete Flow', () => {
       .send({
         name: 'Cliente Um',
         cpf: '11111111111',
-        email: 'cliente1@email.com'
+        email: 'cliente1@email.com',
+        consentGiven: true
       });
 
     const account1_1 = await request(app)
@@ -216,7 +219,8 @@ describe('Integration Tests - Complete Flow', () => {
       .send({
         name: 'Cliente Dois',
         cpf: '22222222222',
-        email: 'cliente2@email.com'
+        email: 'cliente2@email.com',
+        consentGiven: true
       });
 
     const account2_1 = await request(app)

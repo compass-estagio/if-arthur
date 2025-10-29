@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(tree:*)",
+      "Bash(npm test:*)",
+      "Bash(npm install:*)",
+      "Bash(ren:*)",
+      "Bash(npm run db:migrate:*)",
+      "Bash(node test-db.js:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

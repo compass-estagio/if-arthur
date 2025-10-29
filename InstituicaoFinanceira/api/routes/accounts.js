@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const customers = require('../models/customer');
 const accounts = require('../models/account');
+const { validateConsent } = require('../middleware/consentValidation');
 
 router.post('/', (req, res) => {
   const { customerId, type, branch, number } = req.body;
@@ -25,7 +26,8 @@ router.post('/', (req, res) => {
   res.status(201).json(newAccount);
 });
 
-router.get('/:accountId/balance', (req, res) => {
+// Middleware de validação de consentimento aplicado
+router.get('/:accountId/balance', validateConsent, (req, res) => {
   const { accountId } = req.params;
   const account = accounts.find(a => a._id === accountId);
   if (!account) {
