@@ -1,0 +1,3 @@
+# Não ignorar node_modules para garantir que pg seja incluído
+!node_modules/pg
+!node_modules/pg-*

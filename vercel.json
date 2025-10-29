@@ -1,9 +1,6 @@
 {
-  "functions": {
-    "api/**/*.js": {
-      "includeFiles": "{node_modules/pg/**,node_modules/pg-*/**}"
-    }
-  },
+  "installCommand": "npm install",
+  "buildCommand": "npm run build",
   "rewrites": [
     {
       "source": "/",
