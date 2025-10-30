@@ -24,8 +24,8 @@ app.use('/customers', customersRouter);
 app.use('/accounts', accountsRouter);
 app.use('/transactions', transactionsRouter);
 
-// Rota de status - Página inicial da API
-app.get('/', (req, res) => {
+// Função helper para resposta da página inicial
+const sendApiStatus = (req, res) => {
   // Se a requisição aceita HTML (navegador), retorna página HTML
   if (req.headers.accept && req.headers.accept.includes('text/html')) {
     res.send(`
@@ -110,7 +110,7 @@ app.get('/', (req, res) => {
             <h1>🏦 Arthur Financial Institution API</h1>
             <p>Instituição Financeira para Open Finance - Fase 2</p>
         </div>
-        
+
         <div class="status">
             <strong>✅ Status:</strong> API Online e Funcionando<br>
             <strong>🕒 Timestamp:</strong> ${new Date().toLocaleString('pt-BR')}<br>
@@ -119,34 +119,34 @@ app.get('/', (req, res) => {
         </div>
 
         <h2>📋 Endpoints Disponíveis</h2>
-        
+
         <div class="endpoint">
             <span class="method post">POST</span><strong>/customers</strong>
             <p>Criar novo cliente no sistema bancário</p>
         </div>
-        
+
         <div class="endpoint">
             <span class="method post">POST</span><strong>/accounts</strong>
             <p>Criar nova conta para um cliente existente</p>
         </div>
-        
+
         <div class="endpoint">
             <span class="method get">GET</span><strong>/accounts/{id}/balance</strong>
             <p>Consultar saldo de uma conta específica</p>
         </div>
-        
+
         <div class="endpoint">
             <span class="method post">POST</span><strong>/transactions</strong>
             <p>Realizar transação (crédito ou débito)</p>
         </div>
-        
+
         <div class="endpoint">
             <span class="method get">GET</span><strong>/transactions/{accountId}</strong>
             <p>Listar todas as transações de uma conta (extrato)</p>
         </div>
 
         <h2>💡 Exemplo de Uso</h2>
-        
+
         <div class="example">
             <h3>1. Criar Cliente</h3>
             <pre>POST https://if-arthur.vercel.app/customers
@@ -216,6 +216,10 @@ Content-Type: application/json
       deployed: "Vercel"
     });
   }
-});
+};
+
+// Rota de status - Página inicial da API (funciona tanto em / quanto em /api)
+app.get('/', sendApiStatus);
+app.get('/api', sendApiStatus);
 
 module.exports = app;
