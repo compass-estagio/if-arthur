@@ -3,14 +3,15 @@
  * Exemplos: cus_001, acc_001, txn_001
  */
 
-const { Customer, Account, Transaction } = require('../models');
+const { query } = require('../../config/postgres');
 
 /**
  * Gera o próximo ID para Customer
  * @returns {Promise<string>} ID no formato cus_001
  */
 async function generateCustomerId() {
-  const count = await Customer.count();
+  const result = await query('SELECT COUNT(*) FROM customers');
+  const count = parseInt(result.rows[0].count);
   const nextNumber = count + 1;
   return `cus_${nextNumber.toString().padStart(3, '0')}`;
 }
@@ -20,7 +21,8 @@ async function generateCustomerId() {
  * @returns {Promise<string>} ID no formato acc_001
  */
 async function generateAccountId() {
-  const count = await Account.count();
+  const result = await query('SELECT COUNT(*) FROM accounts');
+  const count = parseInt(result.rows[0].count);
   const nextNumber = count + 1;
   return `acc_${nextNumber.toString().padStart(3, '0')}`;
 }
@@ -30,7 +32,8 @@ async function generateAccountId() {
  * @returns {Promise<string>} ID no formato txn_001
  */
 async function generateTransactionId() {
-  const count = await Transaction.count();
+  const result = await query('SELECT COUNT(*) FROM transactions');
+  const count = parseInt(result.rows[0].count);
   const nextNumber = count + 1;
   return `txn_${nextNumber.toString().padStart(3, '0')}`;
 }

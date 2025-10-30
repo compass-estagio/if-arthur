@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Customer } = require('../models');
+const { createCustomer, findCustomerByCpf } = require('../db/customers');
 const { generateCustomerId } = require('../utils/idGenerator');
 
 router.post('/', async (req, res) => {
@@ -17,7 +17,7 @@ router.post('/', async (req, res) => {
     }
 
     // Verificar se CPF já existe
-    const existingCustomer = await Customer.findOne({ where: { cpf } });
+    const existingCustomer = await findCustomerByCpf(cpf);
     if (existingCustomer) {
       return res.status(409).json({ error: 'Cliente com este CPF já existe.' });
     }
@@ -26,13 +26,13 @@ router.post('/', async (req, res) => {
     const id = await generateCustomerId();
 
     // Criar novo cliente
-    const newCustomer = await Customer.create({
+    const newCustomer = await createCustomer(
       id,
       name,
       cpf,
       email,
-      consentGiven: Boolean(consentGiven)
-    });
+      Boolean(consentGiven)
+    );
 
     // Retornar no formato esperado pelos testes (_id ao invés de id)
     const response = {
@@ -40,7 +40,7 @@ router.post('/', async (req, res) => {
       name: newCustomer.name,
       cpf: newCustomer.cpf,
       email: newCustomer.email,
-      consentGiven: newCustomer.consentGiven,
+      consentGiven: newCustomer.consent_given,
       accounts: [] // Por enquanto vazio, será populado quando buscar com include
     };
 

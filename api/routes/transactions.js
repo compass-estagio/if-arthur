@@ -1,40 +1,48 @@
 const express = require('express');
 const router = express.Router();
-const { Account, Transaction } = require('../models');
-const { sequelize } = require('../../config/db');
+const { findAccountById, updateAccountBalance } = require('../db/accounts');
+const { createTransaction, getTransactionsByAccountId } = require('../db/transactions');
+const { getClient, beginTransaction, commitTransaction, rollbackTransaction } = require('../../config/postgres');
 const { generateTransactionId } = require('../utils/idGenerator');
 const { validateConsent } = require('../middleware/consentValidation');
 
 // Realizar transação (crédito ou débito)
 router.post('/', async (req, res) => {
-  // Usar transação SQL para garantir atomicidade
-  const t = await sequelize.transaction();
+  const client = await getClient();
 
   try {
+    // Iniciar transação SQL
+    await beginTransaction(client);
+
     const { accountId, description, amount, type, category } = req.body;
 
     // Validações
     if (!accountId || !description || !amount || !type || !category) {
-      await t.rollback();
+      await rollbackTransaction(client);
+      client.release();
       return res.status(400).json({ error: 'Campos obrigatórios: accountId, description, amount, type, category.' });
     }
 
     // Buscar conta com lock (evita race conditions)
-    const account = await Account.findByPk(accountId, { transaction: t, lock: true });
-    if (!account) {
-      await t.rollback();
+    const accountResult = await client.query('SELECT * FROM accounts WHERE id = $1 FOR UPDATE', [accountId]);
+    if (accountResult.rows.length === 0) {
+      await rollbackTransaction(client);
+      client.release();
       return res.status(404).json({ error: 'Conta não encontrada.' });
     }
+    const account = accountResult.rows[0];
 
     // Validar tipo de transação
     if (type !== 'credit' && type !== 'debit') {
-      await t.rollback();
+      await rollbackTransaction(client);
+      client.release();
       return res.status(400).json({ error: 'Tipo de transação deve ser credit ou debit.' });
     }
 
     // Verificar saldo para débito
-    if (type === 'debit' && account.balance < Number(amount)) {
-      await t.rollback();
+    if (type === 'debit' && parseFloat(account.balance) < Number(amount)) {
+      await rollbackTransaction(client);
+      client.release();
       return res.status(400).json({ error: 'Saldo insuficiente.' });
     }
 
@@ -45,26 +53,30 @@ router.post('/', async (req, res) => {
     const date = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
 
     // Criar transação
-    const newTransaction = await Transaction.create({
-      id,
-      accountId,
-      date,
-      description,
-      amount: Number(amount),
-      type,
-      category
-    }, { transaction: t });
+    const transactionResult = await client.query(
+      `INSERT INTO transactions (id, account_id, date, description, amount, type, category, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
+       RETURNING *`,
+      [id, accountId, date, description, Number(amount), type, category]
+    );
+    const newTransaction = transactionResult.rows[0];
 
     // Atualizar saldo da conta
+    let newBalance;
     if (type === 'credit') {
-      account.balance = parseFloat(account.balance) + Number(amount);
+      newBalance = parseFloat(account.balance) + Number(amount);
     } else {
-      account.balance = parseFloat(account.balance) - Number(amount);
+      newBalance = parseFloat(account.balance) - Number(amount);
     }
-    await account.save({ transaction: t });
+
+    await client.query(
+      'UPDATE accounts SET balance = $1, updated_at = NOW() WHERE id = $2',
+      [newBalance, accountId]
+    );
 
     // Commit da transação
-    await t.commit();
+    await commitTransaction(client);
+    client.release();
 
     // Retornar no formato esperado pelos testes
     const response = {
@@ -79,7 +91,8 @@ router.post('/', async (req, res) => {
     res.status(201).json(response);
   } catch (error) {
     // Rollback em caso de erro
-    await t.rollback();
+    await rollbackTransaction(client);
+    client.release();
     console.error('Erro ao realizar transação:', error);
     res.status(500).json({ error: 'Erro interno ao realizar transação.' });
   }
@@ -92,16 +105,13 @@ router.get('/:accountId', validateConsent, async (req, res) => {
     const { accountId } = req.params;
 
     // Verificar se conta existe
-    const account = await Account.findByPk(accountId);
+    const account = await findAccountById(accountId);
     if (!account) {
       return res.status(404).json({ error: 'Conta não encontrada.' });
     }
 
     // Buscar todas as transações da conta
-    const accountTransactions = await Transaction.findAll({
-      where: { accountId },
-      order: [['created_at', 'ASC']] // Ordenar por data de criação
-    });
+    const accountTransactions = await getTransactionsByAccountId(accountId);
 
     // Retornar no formato esperado pelos testes
     const response = accountTransactions.map(t => ({

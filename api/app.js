@@ -1,10 +1,10 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-require('dotenv').config();
 
-// Inicializar conexão com banco de dados (lazy)
-let testConnection;
-let models;
+// Carregar dotenv apenas em desenvolvimento
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
 
 const customersRouter = require('./routes/customers');
 const accountsRouter = require('./routes/accounts');
@@ -12,19 +12,11 @@ const transactionsRouter = require('./routes/transactions');
 
 const app = express();
 
-// Middleware para inicialização lazy (carrega DB e models sob demanda)
-app.use((req, res, next) => {
-  if (!models) {
-    models = require('./models');
-  }
-  if (!testConnection && process.env.NODE_ENV !== 'test') {
-    const db = require('../config/db');
-    testConnection = db.testConnection;
-    // Não espera testConnection terminar, apenas dispara
-    testConnection().catch(err => console.error('Erro ao testar conexão:', err));
-  }
-  next();
-});
+// Testar conexão com banco (apenas em desenvolvimento/produção, não em testes)
+if (process.env.NODE_ENV !== 'test') {
+  const { testConnection } = require('../config/postgres');
+  testConnection().catch(err => console.error('Erro ao testar conexão:', err));
+}
 
 app.use(bodyParser.json());
 

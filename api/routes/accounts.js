@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { Customer, Account } = require('../models');
+const { findCustomerById } = require('../db/customers');
+const { createAccount, findAccountById } = require('../db/accounts');
 const { generateAccountId } = require('../utils/idGenerator');
 const { validateConsent } = require('../middleware/consentValidation');
 
@@ -14,7 +15,7 @@ router.post('/', async (req, res) => {
     }
 
     // Verificar se cliente existe
-    const customer = await Customer.findByPk(customerId);
+    const customer = await findCustomerById(customerId);
     if (!customer) {
       return res.status(404).json({ error: 'Cliente não encontrado.' });
     }
@@ -23,14 +24,14 @@ router.post('/', async (req, res) => {
     const id = await generateAccountId();
 
     // Criar nova conta
-    const newAccount = await Account.create({
+    const newAccount = await createAccount(
       id,
       customerId,
       type,
       branch,
       number,
-      balance: 0.0
-    });
+      0.0
+    );
 
     // Retornar no formato esperado pelos testes
     const response = {
@@ -55,7 +56,7 @@ router.get('/:accountId/balance', validateConsent, async (req, res) => {
     const { accountId } = req.params;
 
     // Buscar conta no banco
-    const account = await Account.findByPk(accountId);
+    const account = await findAccountById(accountId);
     if (!account) {
       return res.status(404).json({ error: 'Conta não encontrada.' });
     }
