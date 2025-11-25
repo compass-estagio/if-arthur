@@ -9,6 +9,7 @@ if (process.env.NODE_ENV !== 'production') {
 const customersRouter = require('./routes/customers');
 const accountsRouter = require('./routes/accounts');
 const transactionsRouter = require('./routes/transactions');
+const consentsRouter = require('./routes/consents');
 
 const app = express();
 
@@ -20,9 +21,11 @@ if (process.env.NODE_ENV !== 'test') {
 
 app.use(bodyParser.json());
 
-app.use('/customers', customersRouter);
-app.use('/accounts', accountsRouter);
-app.use('/transactions', transactionsRouter);
+// Rotas com prefixo /openfinance
+app.use('/openfinance/customers', customersRouter);
+app.use('/openfinance/accounts', accountsRouter);
+app.use('/openfinance/transactions', transactionsRouter);
+app.use('/openfinance/consents', consentsRouter);
 
 // Função helper para resposta da página inicial
 const sendApiStatus = (req, res) => {
@@ -82,6 +85,7 @@ const sendApiStatus = (req, res) => {
         }
         .post { background: #28a745; color: white; }
         .get { background: #007bff; color: white; }
+        .delete { background: #dc3545; color: white; }
         .example {
             background: #fff3cd;
             padding: 15px;
@@ -121,47 +125,84 @@ const sendApiStatus = (req, res) => {
         <h2>📋 Endpoints Disponíveis</h2>
 
         <div class="endpoint">
-            <span class="method post">POST</span><strong>/customers</strong>
+            <span class="method get">GET</span><strong>/openfinance/customers/lookup/by-cpf/{cpf}</strong>
+            <p>Buscar cliente por CPF (rota pública para integração)</p>
+        </div>
+
+        <div class="endpoint">
+            <span class="method post">POST</span><strong>/openfinance/customers</strong>
             <p>Criar novo cliente no sistema bancário</p>
         </div>
 
         <div class="endpoint">
-            <span class="method post">POST</span><strong>/accounts</strong>
+            <span class="method post">POST</span><strong>/openfinance/accounts</strong>
             <p>Criar nova conta para um cliente existente</p>
         </div>
 
         <div class="endpoint">
-            <span class="method get">GET</span><strong>/accounts/{id}/balance</strong>
-            <p>Consultar saldo de uma conta específica</p>
+            <span class="method get">GET</span><strong>/openfinance/accounts/{id}/balance</strong>
+            <p>Consultar saldo de uma conta específica (requer consentimento)</p>
         </div>
 
         <div class="endpoint">
-            <span class="method post">POST</span><strong>/transactions</strong>
+            <span class="method post">POST</span><strong>/openfinance/transactions</strong>
             <p>Realizar transação (crédito ou débito)</p>
         </div>
 
         <div class="endpoint">
-            <span class="method get">GET</span><strong>/transactions/{accountId}</strong>
-            <p>Listar todas as transações de uma conta (extrato)</p>
+            <span class="method get">GET</span><strong>/openfinance/transactions/{accountId}</strong>
+            <p>Listar todas as transações de uma conta (requer consentimento)</p>
+        </div>
+
+        <div class="endpoint">
+            <span class="method post">POST</span><strong>/openfinance/consents</strong>
+            <p>Criar consentimento autorizado (válido por 1 ano)</p>
+        </div>
+
+        <div class="endpoint">
+            <span class="method get">GET</span><strong>/openfinance/consents/{id}</strong>
+            <p>Consultar consentimento específico</p>
+        </div>
+
+        <div class="endpoint">
+            <span class="method delete">DELETE</span><strong>/openfinance/consents/{id}</strong>
+            <p>Revogar consentimento existente</p>
         </div>
 
         <h2>💡 Exemplo de Uso</h2>
 
         <div class="example">
             <h3>1. Criar Cliente</h3>
-            <pre>POST https://if-arthur.vercel.app/customers
+            <pre>POST https://if-arthur.vercel.app/openfinance/customers
 Content-Type: application/json
 
 {
   "name": "Maria Silva",
   "cpf": "12345678900",
-  "email": "maria.silva@email.com"
+  "email": "maria.silva@email.com",
+  "consentGiven": true
 }</pre>
         </div>
 
         <div class="example">
-            <h3>2. Consultar Saldo</h3>
-            <pre>GET https://if-arthur.vercel.app/accounts/acc_001/balance</pre>
+            <h3>2. Buscar Cliente por CPF</h3>
+            <pre>GET https://if-arthur.vercel.app/openfinance/customers/lookup/by-cpf/12345678900</pre>
+        </div>
+
+        <div class="example">
+            <h3>3. Criar Consentimento</h3>
+            <pre>POST https://if-arthur.vercel.app/openfinance/consents
+Content-Type: application/json
+
+{
+  "customerId": "cus_001",
+  "permissions": ["READ_ACCOUNTS", "READ_BALANCES", "READ_TRANSACTIONS"]
+}</pre>
+        </div>
+
+        <div class="example">
+            <h3>4. Consultar Saldo (Requer Consentimento)</h3>
+            <pre>GET https://if-arthur.vercel.app/openfinance/accounts/acc_001/balance</pre>
         </div>
 
         <div class="footer">
@@ -182,33 +223,55 @@ Content-Type: application/json
       timestamp: new Date().toISOString(),
       endpoints: {
         customers: {
-          create: "POST /customers",
-          description: "Criar novo cliente"
+          lookup: "GET /openfinance/customers/lookup/by-cpf/{cpf}",
+          create: "POST /openfinance/customers",
+          description: "Gerenciar clientes e buscar por CPF"
         },
         accounts: {
-          create: "POST /accounts",
-          balance: "GET /accounts/{id}/balance",
-          description: "Gerenciar contas bancárias"
+          create: "POST /openfinance/accounts",
+          balance: "GET /openfinance/accounts/{id}/balance",
+          description: "Gerenciar contas bancárias (saldo requer consentimento)"
         },
         transactions: {
-          create: "POST /transactions",
-          list: "GET /transactions/{accountId}",
-          description: "Realizar e consultar transações"
+          create: "POST /openfinance/transactions",
+          list: "GET /openfinance/transactions/{accountId}",
+          description: "Realizar e consultar transações (listagem requer consentimento)"
+        },
+        consents: {
+          create: "POST /openfinance/consents",
+          get: "GET /openfinance/consents/{id}",
+          revoke: "DELETE /openfinance/consents/{id}",
+          description: "Gerenciar consentimentos Open Finance"
         }
       },
       examples: {
+        lookupCustomer: {
+          method: "GET",
+          url: "/openfinance/customers/lookup/by-cpf/12345678900",
+          description: "Buscar cliente por CPF"
+        },
         createCustomer: {
           method: "POST",
-          url: "/customers",
+          url: "/openfinance/customers",
           body: {
             name: "Maria Silva",
             cpf: "12345678900",
-            email: "maria.silva@email.com"
+            email: "maria.silva@email.com",
+            consentGiven: true
+          }
+        },
+        createConsent: {
+          method: "POST",
+          url: "/openfinance/consents",
+          body: {
+            customerId: "cus_001",
+            permissions: ["READ_ACCOUNTS", "READ_BALANCES", "READ_TRANSACTIONS"]
           }
         },
         checkBalance: {
           method: "GET",
-          url: "/accounts/acc_001/balance"
+          url: "/openfinance/accounts/acc_001/balance",
+          description: "Requer consentimento ativo"
         }
       },
       documentation: "https://github.com/compass-estagio/if-arthur",

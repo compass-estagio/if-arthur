@@ -1,8 +1,11 @@
 const { query } = require('../../config/postgres');
+const { findActiveConsentByCustomerId } = require('../db/consents');
 
 /**
  * Middleware para validar o consentimento do cliente antes de listar dados sensíveis
  * Conforme LGPD e Open Finance Brasil
+ *
+ * Verifica se existe um consentimento AUTHORIZED e não-expirado
  */
 const validateConsent = async (req, res, next) => {
   try {
@@ -12,8 +15,7 @@ const validateConsent = async (req, res, next) => {
     const text = `
       SELECT
         accounts.*,
-        customers.id as customer_id,
-        customers.consent_given
+        customers.id as customer_id
       FROM accounts
       LEFT JOIN customers ON accounts.customer_id = customers.id
       WHERE accounts.id = $1
@@ -32,17 +34,21 @@ const validateConsent = async (req, res, next) => {
       return res.status(404).json({ error: 'Cliente associado à conta não encontrado.' });
     }
 
-    // Verificar se o cliente deu consentimento
-    if (!account.consent_given) {
+    // Buscar consentimento ativo do cliente
+    const activeConsent = await findActiveConsentByCustomerId(account.customer_id);
+
+    // Verificar se existe consentimento válido
+    if (!activeConsent) {
       return res.status(403).json({
-        error: 'Acesso negado: Cliente não forneceu consentimento para compartilhamento de dados.',
+        error: 'CONSENT_REQUIRED',
+        message: 'Acesso negado: Cliente não possui consentimento válido para compartilhamento de dados.',
         customerId: account.customer_id,
         accountId: accountId,
-        message: 'O cliente precisa autorizar o compartilhamento de dados financeiros conforme LGPD.'
+        details: 'É necessário criar um consentimento autorizado e não expirado para acessar estes dados.'
       });
     }
 
-    // Cliente consentiu, permitir acesso
+    // Cliente possui consentimento válido, permitir acesso
     next();
   } catch (error) {
     console.error('Erro no middleware de consentimento:', error);

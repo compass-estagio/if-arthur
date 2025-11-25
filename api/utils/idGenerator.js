@@ -38,8 +38,20 @@ async function generateTransactionId() {
   return `txn_${nextNumber.toString().padStart(3, '0')}`;
 }
 
+/**
+ * Gera o próximo ID para Consent
+ * @returns {Promise<string>} ID no formato con_001
+ */
+async function generateConsentId() {
+  const result = await query('SELECT COUNT(*) FROM consents');
+  const count = parseInt(result.rows[0].count);
+  const nextNumber = count + 1;
+  return `con_${nextNumber.toString().padStart(3, '0')}`;
+}
+
 module.exports = {
   generateCustomerId,
   generateAccountId,
-  generateTransactionId
+  generateTransactionId,
+  generateConsentId
 };

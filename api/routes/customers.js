@@ -3,6 +3,44 @@ const router = express.Router();
 const { createCustomer, findCustomerByCpf } = require('../db/customers');
 const { generateCustomerId } = require('../utils/idGenerator');
 
+/**
+ * GET /customers/lookup/by-cpf/:cpf
+ * Busca cliente por CPF (rota pública)
+ * Retorna apenas _id e cpf para integração com API Principal
+ */
+router.get('/lookup/by-cpf/:cpf', async (req, res) => {
+  try {
+    const { cpf } = req.params;
+
+    // Validação básica de CPF
+    if (!cpf || cpf.length !== 11) {
+      return res.status(400).json({
+        error: 'CPF inválido. O CPF deve conter 11 dígitos numéricos.'
+      });
+    }
+
+    // Buscar cliente por CPF
+    const customer = await findCustomerByCpf(cpf);
+
+    if (!customer) {
+      return res.status(404).json({
+        error: 'Cliente não encontrado com este CPF.'
+      });
+    }
+
+    // Retornar apenas _id e cpf (dados necessários para integração)
+    res.json({
+      _id: customer.id,
+      cpf: customer.cpf
+    });
+  } catch (error) {
+    console.error('Erro ao buscar cliente por CPF:', error);
+    res.status(500).json({
+      error: 'Erro interno ao buscar cliente.'
+    });
+  }
+});
+
 router.post('/', async (req, res) => {
   try {
     const { name, cpf, email, consentGiven } = req.body;
