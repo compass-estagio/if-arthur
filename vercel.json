@@ -1,6 +1,13 @@
 {
+  "version": 2,
   "installCommand": "npm install",
   "buildCommand": "npm run build",
+  "functions": {
+    "api/index.js": {
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  },
   "rewrites": [
     {
       "source": "/",

@@ -1,6 +1,6 @@
 require('dotenv').config();
 const { testConnection, sequelize } = require('./config/db');
-const { Customer, Account, Transaction } = require('./api/models');
+const { Customer, Account, Transaction } = require('./lib/models');
 
 async function testDatabase() {
   console.log('🔍 Testando conexão com banco de dados PostgreSQL (Neon)...\n');

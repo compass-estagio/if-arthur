@@ -1,6 +1,6 @@
 const request = require('supertest');
-const app = require('../api/app');
-const { clearDatabase, closeDatabase } = require('../api/utils/testHelpers');
+const app = require('../lib/app');
+const { clearDatabase, closeDatabase } = require('../lib/utils/testHelpers');
 
 describe('Integration Tests - Complete Flow', () => {
   beforeEach(async () => {

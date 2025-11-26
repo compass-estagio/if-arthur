@@ -1,3 +1,19 @@
-# Não ignorar node_modules para garantir que pg seja incluído
-!node_modules/pg
-!node_modules/pg-*
+# Ignorar arquivos que não são funções serverless
+# Apenas api/index.js deve ser tratado como função serverless
+
+# Não criar funções serverless para estes arquivos
+api/routes/
+api/models/
+api/db/
+api/utils/
+api/middleware/
+api/app.js
+
+# Ignorar arquivos de desenvolvimento e testes
+*.test.js
+*.spec.js
+__tests__/
+coverage/
+
+# Arquivos temporários e antigos
+*.old.js
