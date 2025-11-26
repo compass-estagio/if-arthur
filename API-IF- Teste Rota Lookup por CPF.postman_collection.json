@@ -1,0 +1,150 @@
+{
+	"info": {
+		"_postman_id": "432204ef-ca55-46b3-8beb-483515c8fd10",
+		"name": "API-IF: Teste Rota Lookup por CPF",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48239737",
+		"_collection_link": "https://mauroarturmauro-9354832.postman.co/workspace/Mauro-Artur's-Workspace~37b51dc8-fc17-4cde-8832-ddf48d08af0e/collection/48239737-432204ef-ca55-46b3-8beb-483515c8fd10?action=share&source=collection_link&creator=48239737"
+	},
+	"item": [
+		{
+			"name": "[1] POST Criar Cliente (para teste)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Gera um CPF e Email únicos para cada execução",
+							"var randomCpf = Math.floor(10000000000 + Math.random() * 90000000000).toString();",
+							"pm.collectionVariables.set(\"customerCpf\", randomCpf);",
+							"pm.collectionVariables.set(\"randomEmail\", `test.${Date.now()}@example.com`);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201 Created\", () => { pm.response.to.have.status(201); });",
+							"var res = pm.response.json();",
+							"pm.test(\"Cliente tem _id (ex: cus_001)\", () => { pm.expect(res).to.have.property('_id'); });",
+							"",
+							"// Salva o ID do cliente e o CPF para o próximo request",
+							"pm.collectionVariables.set(\"customerId\", res._id);",
+							"pm.collectionVariables.set(\"customerCpf\", res.cpf);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Cliente Teste Lookup\",\n    \"cpf\": \"{{customerCpf}}\",\n    \"email\": \"{{randomEmail}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/openfinance/customers",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"openfinance",
+						"customers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[2] GET Buscar Cliente por CPF (Nova Rota)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", () => { pm.response.to.have.status(200); });",
+							"var res = pm.response.json();",
+							"",
+							"pm.test(\"CPF retornado é o mesmo que buscamos\", () => {",
+							"    pm.expect(res.cpf).to.eql(pm.collectionVariables.get(\"customerCpf\"));",
+							"});",
+							"",
+							"pm.test(\"ID do cliente é o mesmo que criamos\", () => {",
+							"    pm.expect(res._id).to.eql(pm.collectionVariables.get(\"customerId\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/openfinance/customers/lookup/by-cpf/{{customerCpf}}",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"openfinance",
+						"customers",
+						"lookup",
+						"by-cpf",
+						"{{customerCpf}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseURL",
+			"value": "https://api-if-mauro-gomes.vercel.app"
+		},
+		{
+			"key": "customerId",
+			"value": ""
+		},
+		{
+			"key": "customerCpf",
+			"value": ""
+		},
+		{
+			"key": "randomEmail",
+			"value": ""
+		}
+	]
+}

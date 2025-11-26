@@ -21,6 +21,15 @@ if (process.env.NODE_ENV !== 'test') {
 
 app.use(bodyParser.json());
 
+// Rota de status do OpenFinance
+app.get('/openfinance/', (req, res) => {
+  res.json({ status: 'online' });
+});
+
+app.get('/openfinance', (req, res) => {
+  res.json({ status: 'online' });
+});
+
 // Rotas com prefixo /openfinance
 app.use('/openfinance/customers', customersRouter);
 app.use('/openfinance/accounts', accountsRouter);

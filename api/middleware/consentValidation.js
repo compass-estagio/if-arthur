@@ -40,8 +40,7 @@ const validateConsent = async (req, res, next) => {
     // Verificar se existe consentimento válido
     if (!activeConsent) {
       return res.status(403).json({
-        error: 'CONSENT_REQUIRED',
-        message: 'Acesso negado: Cliente não possui consentimento válido para compartilhamento de dados.',
+        error: 'Cliente não possui um consentimento ativo para compartilhamento de dados.',
         customerId: account.customer_id,
         accountId: accountId,
         details: 'É necessário criar um consentimento autorizado e não expirado para acessar estes dados.'

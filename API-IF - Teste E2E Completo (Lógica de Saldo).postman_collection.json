@@ -1,0 +1,778 @@
+{
+	"info": {
+		"_postman_id": "db77923a-e664-4c2d-b172-00d9caf73a72",
+		"name": "API-IF - Teste E2E Completo (Lógica de Saldo)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48239737",
+		"_collection_link": "https://mauroarturmauro-9354832.postman.co/workspace/Mauro-Artur's-Workspace~37b51dc8-fc17-4cde-8832-ddf48d08af0e/collection/48239737-db77923a-e664-4c2d-b172-00d9caf73a72?action=share&source=collection_link&creator=48239737"
+	},
+	"item": [
+		{
+			"name": "[1] GET Status (Verifica Prefixo)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", () => { pm.response.to.have.status(200); });",
+							"pm.test(\"API está online\", () => {",
+							"    pm.expect(pm.response.json().status).to.eql(\"online\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/openfinance/",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"openfinance",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[2] POST Criar Cliente",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var randomCpf = Math.floor(10000000000 + Math.random() * 90000000000).toString();",
+							"pm.collectionVariables.set(\"randomCpf\", randomCpf);",
+							"pm.collectionVariables.set(\"randomEmail\", `test.${Date.now()}@example.com`);"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201 Created\", () => { pm.response.to.have.status(201); });",
+							"var res = pm.response.json();",
+							"pm.test(\"Cliente tem _id (ex: cus_001)\", () => { pm.expect(res).to.have.property('_id'); });",
+							"pm.collectionVariables.set(\"customerId\", res._id);"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Cliente Teste OpenFinance\",\n    \"cpf\": \"{{randomCpf}}\",\n    \"email\": \"{{randomEmail}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/openfinance/customers",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"openfinance",
+						"customers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[3] POST Criar Conta (Saldo 1000)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var randomNum = Math.floor(100000 + Math.random() * 900000).toString();",
+							"pm.collectionVariables.set(\"randomAccountNum\", randomNum);"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201 Created\", () => { pm.response.to.have.status(201); });",
+							"var res = pm.response.json();",
+							"pm.test(\"Conta tem _id (ex: acc_001)\", () => { pm.expect(res).to.have.property('_id'); });",
+							"pm.test(\"Conta tem customer_id\", () => { pm.expect(res).to.have.property('customer_id'); });",
+							"pm.collectionVariables.set(\"accountId\", res._id);"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"customerId\": \"cus_001\",\n    \"type\": \"checking\",\n    \"branch\": \"001\",\n    \"number\": \"{{randomAccountNum}}\",\n    \"balance\": 1000\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/openfinance/accounts",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"openfinance",
+						"accounts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[4] (FALHA) GET Saldo (Sem Consentimento)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 403 Forbidden\", () => { pm.response.to.have.status(403); });",
+							"pm.test(\"Erro de consentimento ativo\", () => {",
+							"    pm.expect(pm.response.json().error).to.include(\"não possui um consentimento ativo\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/openfinance/accounts/{{accountId}}/balance",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"openfinance",
+						"accounts",
+						"{{accountId}}",
+						"balance"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[5] (FALHA) GET Lista de Contas (Sem Consentimento)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 403 Forbidden\", () => { pm.response.to.have.status(403); });",
+							"pm.test(\"Erro de consentimento ativo\", () => {",
+							"    pm.expect(pm.response.json().error).to.include(\"não possui um consentimento ativo\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/openfinance/customers/{{customerId}}/accounts",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"openfinance",
+						"customers",
+						"{{customerId}}",
+						"accounts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[6] (FALHA) GET Dados do Cliente (Sem Consentimento)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 403 Forbidden\", () => { pm.response.to.have.status(403); });",
+							"pm.test(\"Erro de consentimento ativo\", () => {",
+							"    pm.expect(pm.response.json().error).to.include(\"não possui um consentimento ativo\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/openfinance/customers/{{customerId}}",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"openfinance",
+						"customers",
+						"{{customerId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[7] (FALHA) GET Transações (Sem Consentimento)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 403 Forbidden\", () => { pm.response.to.have.status(403); });",
+							"pm.test(\"Erro de consentimento ativo\", () => {",
+							"    pm.expect(pm.response.json().error).to.include(\"não possui um consentimento ativo\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/openfinance/transactions/{{accountId}}",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"openfinance",
+						"transactions",
+						"{{accountId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[8] POST Criar Consentimento (Autorizar TUDO)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201 Created\", () => { pm.response.to.have.status(201); });",
+							"var res = pm.response.json();",
+							"pm.test(\"Consentimento tem _id (ex: con_001)\", () => { pm.expect(res).to.have.property('_id'); });",
+							"pm.test(\"Status é 'AUTHORIZED' (Simulação MVP)\", () => { pm.expect(res.status).to.eql(\"AUTHORIZED\"); });",
+							"pm.test(\"Data de expiração foi definida (1 ano)\", () => { pm.expect(res).to.have.property('expirationDateTime'); });",
+							"",
+							"pm.collectionVariables.set(\"consentId\", res._id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"customerId\": \"{{customerId}}\",\n    \"permissions\": [\n        \"CUSTOMER_DATA_READ\",\n        \"ACCOUNTS_READ\",\n        \"BALANCES_READ\",\n        \"TRANSACTIONS_READ\"\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/openfinance/consents",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"openfinance",
+						"consents"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[9] GET Consultar Consentimento (Verificar Status)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", () => { pm.response.to.have.status(200); });",
+							"var res = pm.response.json();",
+							"pm.test(\"Status ainda é 'AUTHORIZED'\", () => { pm.expect(res.status).to.eql(\"AUTHORIZED\"); });",
+							"pm.test(\"ID do cliente está correto\", () => { pm.expect(res.customerId).to.eql(pm.collectionVariables.get(\"customerId\")); });"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/openfinance/consents/{{consentId}}",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"openfinance",
+						"consents",
+						"{{consentId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[10] (SUCESSO) GET Dados do Cliente",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", () => { pm.response.to.have.status(200); });",
+							"pm.test(\"Retornou dados do cliente\", () => {",
+							"    pm.expect(pm.response.json()._id).to.eql(pm.collectionVariables.get(\"customerId\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/openfinance/customers/{{customerId}}",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"openfinance",
+						"customers",
+						"{{customerId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[11] (SUCESSO) GET Lista de Contas",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", () => { pm.response.to.have.status(200); });",
+							"pm.test(\"Retornou um array de contas\", () => {",
+							"    pm.expect(pm.response.json()).to.be.an('array');",
+							"});",
+							"pm.test(\"Array contém a conta que criamos\", () => {",
+							"    var res = pm.response.json();",
+							"    pm.expect(res[0]._id).to.eql(pm.collectionVariables.get(\"accountId\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/openfinance/customers/{{customerId}}/accounts",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"openfinance",
+						"customers",
+						"{{customerId}}",
+						"accounts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[12] (SUCESSO) GET Saldo (Inicial)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", () => { pm.response.to.have.status(200); });",
+							"pm.test(\"Retornou o saldo inicial correto (1000)\", () => {",
+							"    pm.expect(pm.response.json()).to.have.property('balance');",
+							"    pm.expect(pm.response.json().balance).to.eql(1000);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/openfinance/accounts/{{accountId}}/balance",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"openfinance",
+						"accounts",
+						"{{accountId}}",
+						"balance"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[13] POST Criar Transação (Crédito +500)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201 Created\", () => { pm.response.to.have.status(201); });",
+							"pm.test(\"Transação tem _id (ex: txn_001)\", () => { pm.expect(pm.response.json()).to.have.property('_id'); });"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"accountId\": \"{{accountId}}\",\n    \"description\": \"Depósito OpenFinance\",\n    \"amount\": 500,\n    \"type\": \"credit\",\n    \"category\": \"Depósito\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/openfinance/transactions",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"openfinance",
+						"transactions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[14] (SUCESSO) GET Saldo Final (Lógica de Negócio)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", () => { pm.response.to.have.status(200); });",
+							"pm.test(\"Retornou o saldo final correto (1500)\", () => {",
+							"    pm.expect(pm.response.json()).to.have.property('balance');",
+							"    pm.expect(pm.response.json().balance).to.eql(1500);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/openfinance/accounts/{{accountId}}/balance",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"openfinance",
+						"accounts",
+						"{{accountId}}",
+						"balance"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[15] (SUCESSO) GET Transações (Lista)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", () => { pm.response.to.have.status(200); });",
+							"pm.test(\"Retornou um array com 1 transação\", () => {",
+							"    pm.expect(pm.response.json()).to.be.an('array').with.lengthOf(1);",
+							"    pm.expect(pm.response.json()[0].amount).to.eql(500);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/openfinance/transactions/{{accountId}}",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"openfinance",
+						"transactions",
+						"{{accountId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[16] DELETE Revogar Consentimento",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204 No Content\", () => { pm.response.to.have.status(204); });"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/openfinance/consents/{{consentId}}",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"openfinance",
+						"consents",
+						"{{consentId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[17] GET Consultar Consentimento (Verificar Status)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", () => { pm.response.to.have.status(200); });",
+							"var res = pm.response.json();",
+							"pm.test(\"Status agora é 'REVOKED'\", () => { pm.expect(res.status).to.eql(\"REVOKED\"); });"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/openfinance/consents/{{consentId}}",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"openfinance",
+						"consents",
+						"{{consentId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[18] (FALHA) GET Saldo (Após Revogar)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 403 Forbidden\", () => { pm.response.to.have.status(403); });",
+							"pm.test(\"Erro de consentimento ativo\", () => {",
+							"    pm.expect(pm.response.json().error).to.include(\"não possui um consentimento ativo\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/openfinance/accounts/{{accountId}}/balance",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"openfinance",
+						"accounts",
+						"{{accountId}}",
+						"balance"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[19] (FALHA) GET Lista de Contas (Após Revogar)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 403 Forbidden\", () => { pm.response.to.have.status(403); });",
+							"pm.test(\"Erro de consentimento ativo\", () => {",
+							"    pm.expect(pm.response.json().error).to.include(\"não possui um consentimento ativo\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/openfinance/customers/{{customerId}}/accounts",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"openfinance",
+						"customers",
+						"{{customerId}}",
+						"accounts"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseURL",
+			"value": "http://localhost:3000"
+		},
+		{
+			"key": "customerId",
+			"value": ""
+		},
+		{
+			"key": "accountId",
+			"value": ""
+		},
+		{
+			"key": "consentId",
+			"value": ""
+		},
+		{
+			"key": "randomCpf",
+			"value": ""
+		},
+		{
+			"key": "randomEmail",
+			"value": ""
+		},
+		{
+			"key": "randomAccountNum",
+			"value": ""
+		}
+	]
+}

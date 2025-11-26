@@ -67,8 +67,7 @@ router.get('/:customerId/accounts', async (req, res) => {
 
     if (!activeConsent) {
       return res.status(403).json({
-        error: 'CONSENT_REQUIRED',
-        message: 'Acesso negado: Cliente não possui consentimento válido para compartilhamento de dados.',
+        error: 'Cliente não possui um consentimento ativo para compartilhamento de dados.',
         customerId: customerId,
         details: 'É necessário criar um consentimento autorizado e não expirado para acessar estes dados.'
       });
@@ -119,8 +118,7 @@ router.get('/:customerId', async (req, res) => {
 
     if (!activeConsent) {
       return res.status(403).json({
-        error: 'CONSENT_REQUIRED',
-        message: 'Acesso negado: Cliente não possui consentimento válido para compartilhamento de dados.',
+        error: 'Cliente não possui um consentimento ativo para compartilhamento de dados.',
         customerId: customerId,
         details: 'É necessário criar um consentimento autorizado e não expirado para acessar estes dados.'
       });
@@ -144,15 +142,24 @@ router.get('/:customerId', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-    const { name, cpf, email, consentGiven } = req.body;
+    let { name, cpf, email, consentGiven } = req.body;
 
     // Validações
     if (!name || !cpf || !email) {
       return res.status(400).json({ error: 'Nome, CPF e email são obrigatórios.' });
     }
 
+    // Normalizar CPF (remover pontos e hífens)
+    cpf = cpf.replace(/[.\-]/g, '');
+
+    // Validar CPF (deve ter 11 dígitos)
+    if (cpf.length !== 11 || !/^\d+$/.test(cpf)) {
+      return res.status(400).json({ error: 'CPF inválido. Deve conter 11 dígitos.' });
+    }
+
+    // consentGiven é opcional, padrão false
     if (consentGiven === undefined) {
-      return res.status(400).json({ error: 'O campo consentGiven é obrigatório (true/false).' });
+      consentGiven = false;
     }
 
     // Verificar se CPF já existe

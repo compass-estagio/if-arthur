@@ -7,7 +7,7 @@ const { validateConsent } = require('../middleware/consentValidation');
 
 router.post('/', async (req, res) => {
   try {
-    const { customerId, type, branch, number } = req.body;
+    const { customerId, type, branch, number, balance } = req.body;
 
     // Validações
     if (!customerId || !type || !branch || !number) {
@@ -23,6 +23,9 @@ router.post('/', async (req, res) => {
     // Gerar ID sequencial
     const id = await generateAccountId();
 
+    // Usar balance fornecido ou 0.0 como padrão
+    const initialBalance = balance !== undefined ? Number(balance) : 0.0;
+
     // Criar nova conta
     const newAccount = await createAccount(
       id,
@@ -30,16 +33,17 @@ router.post('/', async (req, res) => {
       type,
       branch,
       number,
-      0.0
+      initialBalance
     );
 
     // Retornar no formato esperado pelos testes
     const response = {
       _id: newAccount.id,
+      customer_id: newAccount.customer_id,
       type: newAccount.type,
       branch: newAccount.branch,
       number: newAccount.number,
-      balance: newAccount.balance,
+      balance: parseFloat(newAccount.balance),
       transactions: [] // Por enquanto vazio
     };
 
@@ -63,7 +67,7 @@ router.get('/:accountId/balance', validateConsent, async (req, res) => {
 
     res.json({
       accountId: account.id,
-      balance: account.balance
+      balance: parseFloat(account.balance)
     });
   } catch (error) {
     console.error('Erro ao consultar saldo:', error);

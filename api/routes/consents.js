@@ -50,6 +50,7 @@ router.post('/', async (req, res) => {
       customerId: consent.customer_id,
       permissions: consent.permissions,
       status: consent.status,
+      expirationDateTime: consent.expiration_date, // Compatibilidade com testes
       expirationDate: consent.expiration_date,
       createdAt: consent.created_at
     });
@@ -110,13 +111,8 @@ router.delete('/:id', async (req, res) => {
       });
     }
 
-    res.json({
-      message: 'Consentimento revogado com sucesso',
-      _id: consent.id,
-      customerId: consent.customer_id,
-      status: consent.status,
-      updatedAt: consent.updated_at
-    });
+    // Retornar 204 No Content conforme esperado pelos testes
+    res.status(204).send();
   } catch (error) {
     console.error('Erro ao revogar consentimento:', error);
     res.status(500).json({

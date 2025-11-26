@@ -1,0 +1,205 @@
+{
+	"info": {
+		"_postman_id": "c1e6a63d-e01a-4117-9103-c05afc9f9fd3",
+		"name": "Script de Seeding (Dados Fixos) para IFs",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48239737",
+		"_collection_link": "https://mauroarturmauro-9354832.postman.co/workspace/Mauro-Artur's-Workspace~37b51dc8-fc17-4cde-8832-ddf48d08af0e/collection/48239737-c1e6a63d-e01a-4117-9103-c05afc9f9fd3?action=share&source=collection_link&creator=48239737"
+	},
+	"item": [
+		{
+			"name": "[1] Criar Cliente (CPF Fixo de Teste)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201 Created\", () => { pm.response.to.have.status(201); });",
+							"pm.test(\"CPF está correto (11122233344)\", () => { pm.expect(pm.response.json().cpf).to.eql(\"11122233344\"); });",
+							"pm.collectionVariables.set(\"ifCustomerId\", pm.response.json()._id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Cliente Teste Padronizado\",\n    \"cpf\": \"111.222.333-44\",\n    \"email\": \"cliente.padrao.11122233344@if.com\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL_IF}}/customers",
+					"host": [
+						"{{baseURL_IF}}"
+					],
+					"path": [
+						"customers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[2] Criar Conta para o Cliente",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201 Created\", () => { pm.response.to.have.status(201); });",
+							"// (O NOME DO CAMPO ABAIXO PODE MUDAR ENTRE AS IFs)",
+							"// Se este teste falhar, tente mudar 'customer_id' para 'customerId'",
+							"pm.test(\"ID do cliente está correto\", () => { pm.expect(pm.response.json().customer_id).to.eql(pm.collectionVariables.get(\"ifCustomerId\")); });",
+							"pm.collectionVariables.set(\"ifAccountId\", pm.response.json()._id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"customerId\": \"{{ifCustomerId}}\",\n    \"type\": \"checking\",\n    \"branch\": \"001\",\n    \"number\": \"987654\",\n    \"balance\": 0\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL_IF}}/accounts",
+					"host": [
+						"{{baseURL_IF}}"
+					],
+					"path": [
+						"accounts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[3] Criar Transação 1 (Crédito +5000)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201 Created\", () => { pm.response.to.have.status(201); });",
+							"pm.test(\"Valor (5000) está correto\", () => { pm.expect(pm.response.json().amount).to.eql(5000); });"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"accountId\": \"{{ifAccountId}}\",\n    \"description\": \"Depósito Salário (Seed)\",\n    \"amount\": 5000.00,\n    \"type\": \"credit\",\n    \"category\": \"Salario\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL_IF}}/transactions",
+					"host": [
+						"{{baseURL_IF}}"
+					],
+					"path": [
+						"transactions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[4] Criar Transação 2 (Débito -150)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201 Created\", () => { pm.response.to.have.status(201); });",
+							"pm.test(\"Valor (150) está correto\", () => { pm.expect(pm.response.json().amount).to.eql(150); });"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"accountId\": \"{{ifAccountId}}\",\n    \"description\": \"Pagamento Conta Luz (Seed)\",\n    \"amount\": 150.00,\n    \"type\": \"debit\",\n    \"category\": \"Contas\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL_IF}}/transactions",
+					"host": [
+						"{{baseURL_IF}}"
+					],
+					"path": [
+						"transactions"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseURL_IF",
+			"value": "http://localhost:3000"
+		},
+		{
+			"key": "ifCustomerId",
+			"value": ""
+		},
+		{
+			"key": "ifAccountId",
+			"value": ""
+		}
+	]
+}
