@@ -1,0 +1,749 @@
+{
+	"id": "8a903539-2988-4143-8ddb-fc14e0a2ac33",
+	"name": "API-IF - Teste E2E Completo (Lógica de Saldo)",
+	"timestamp": "2025-11-26T01:14:19.291Z",
+	"collection_id": "30504852-0bc49a6d-136b-4efc-8fb9-54474b403677",
+	"folder_id": 0,
+	"environment_id": "0",
+	"totalPass": 24,
+	"delay": 0,
+	"persist": true,
+	"status": "finished",
+	"startedAt": "2025-11-26T01:14:15.313Z",
+	"totalFail": 18,
+	"results": [
+		{
+			"id": "ea100679-bd1c-4fca-97c3-a059037c5d5b",
+			"name": "[1] GET Status (Verifica Prefixo)",
+			"url": " http://localhost:3000/openfinance/",
+			"time": 5,
+			"responseCode": {
+				"code": 404,
+				"name": "Not Found"
+			},
+			"tests": {
+				"Status code is 200 OK": false,
+				"API está online": false
+			},
+			"testPassFailCounts": {
+				"Status code is 200 OK": {
+					"pass": 0,
+					"fail": 1
+				},
+				"API está online": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				5
+			],
+			"allTests": [
+				{
+					"Status code is 200 OK": false,
+					"API está online": false
+				}
+			]
+		},
+		{
+			"id": "0fe08875-2c22-48b1-b2ff-7df786daa336",
+			"name": "[2] POST Criar Cliente",
+			"url": " http://localhost:3000/openfinance/customers",
+			"time": 359,
+			"responseCode": {
+				"code": 201,
+				"name": "Created"
+			},
+			"tests": {
+				"Status code is 201 Created": true,
+				"Cliente tem _id (ex: cus_001)": true
+			},
+			"testPassFailCounts": {
+				"Status code is 201 Created": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Cliente tem _id (ex: cus_001)": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				359
+			],
+			"allTests": [
+				{
+					"Status code is 201 Created": true,
+					"Cliente tem _id (ex: cus_001)": true
+				}
+			]
+		},
+		{
+			"id": "aba2066d-35e1-4c7c-a9a3-0b7fead59bb7",
+			"name": "[3] POST Criar Conta (Saldo 1000)",
+			"url": " http://localhost:3000/openfinance/accounts",
+			"time": 120,
+			"responseCode": {
+				"code": 201,
+				"name": "Created"
+			},
+			"tests": {
+				"Status code is 201 Created": true,
+				"Conta tem _id (ex: acc_001)": true,
+				"Conta tem customer_id": false
+			},
+			"testPassFailCounts": {
+				"Status code is 201 Created": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Conta tem _id (ex: acc_001)": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Conta tem customer_id": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				120
+			],
+			"allTests": [
+				{
+					"Status code is 201 Created": true,
+					"Conta tem _id (ex: acc_001)": true,
+					"Conta tem customer_id": false
+				}
+			]
+		},
+		{
+			"id": "b5ac6d98-5e80-4f05-b622-1adffd465a45",
+			"name": "[4] (FALHA) GET Saldo (Sem Consentimento)",
+			"url": " http://localhost:3000/openfinance/accounts/acc_010/balance",
+			"time": 81,
+			"responseCode": {
+				"code": 403,
+				"name": "Forbidden"
+			},
+			"tests": {
+				"Status code is 403 Forbidden": true,
+				"Erro de consentimento ativo": false
+			},
+			"testPassFailCounts": {
+				"Status code is 403 Forbidden": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Erro de consentimento ativo": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				81
+			],
+			"allTests": [
+				{
+					"Status code is 403 Forbidden": true,
+					"Erro de consentimento ativo": false
+				}
+			]
+		},
+		{
+			"id": "3bcb0c49-98dc-48f7-bfe8-ae34a32f2d08",
+			"name": "[5] (FALHA) GET Lista de Contas (Sem Consentimento)",
+			"url": " http://localhost:3000/openfinance/customers/cus_012/accounts",
+			"time": 76,
+			"responseCode": {
+				"code": 403,
+				"name": "Forbidden"
+			},
+			"tests": {
+				"Status code is 403 Forbidden": true,
+				"Erro de consentimento ativo": false
+			},
+			"testPassFailCounts": {
+				"Status code is 403 Forbidden": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Erro de consentimento ativo": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				76
+			],
+			"allTests": [
+				{
+					"Status code is 403 Forbidden": true,
+					"Erro de consentimento ativo": false
+				}
+			]
+		},
+		{
+			"id": "23a2e6fe-2578-4155-938b-8750ca7496bd",
+			"name": "[6] (FALHA) GET Dados do Cliente (Sem Consentimento)",
+			"url": " http://localhost:3000/openfinance/customers/cus_012",
+			"time": 75,
+			"responseCode": {
+				"code": 403,
+				"name": "Forbidden"
+			},
+			"tests": {
+				"Status code is 403 Forbidden": true,
+				"Erro de consentimento ativo": false
+			},
+			"testPassFailCounts": {
+				"Status code is 403 Forbidden": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Erro de consentimento ativo": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				75
+			],
+			"allTests": [
+				{
+					"Status code is 403 Forbidden": true,
+					"Erro de consentimento ativo": false
+				}
+			]
+		},
+		{
+			"id": "6709bc34-84c7-4851-b11f-09125002be3b",
+			"name": "[7] (FALHA) GET Transações (Sem Consentimento)",
+			"url": " http://localhost:3000/openfinance/transactions/acc_010",
+			"time": 74,
+			"responseCode": {
+				"code": 403,
+				"name": "Forbidden"
+			},
+			"tests": {
+				"Status code is 403 Forbidden": true,
+				"Erro de consentimento ativo": false
+			},
+			"testPassFailCounts": {
+				"Status code is 403 Forbidden": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Erro de consentimento ativo": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				74
+			],
+			"allTests": [
+				{
+					"Status code is 403 Forbidden": true,
+					"Erro de consentimento ativo": false
+				}
+			]
+		},
+		{
+			"id": "f94dcfa6-3542-4f09-92ed-9e684a3f06a6",
+			"name": "[8] POST Criar Consentimento (Autorizar TUDO)",
+			"url": " http://localhost:3000/openfinance/consents",
+			"time": 113,
+			"responseCode": {
+				"code": 201,
+				"name": "Created"
+			},
+			"tests": {
+				"Status code is 201 Created": true,
+				"Consentimento tem _id (ex: con_001)": true,
+				"Status é 'AUTHORIZED' (Simulação MVP)": true,
+				"Data de expiração foi definida (1 ano)": false
+			},
+			"testPassFailCounts": {
+				"Status code is 201 Created": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Consentimento tem _id (ex: con_001)": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Status é 'AUTHORIZED' (Simulação MVP)": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Data de expiração foi definida (1 ano)": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				113
+			],
+			"allTests": [
+				{
+					"Status code is 201 Created": true,
+					"Consentimento tem _id (ex: con_001)": true,
+					"Status é 'AUTHORIZED' (Simulação MVP)": true,
+					"Data de expiração foi definida (1 ano)": false
+				}
+			]
+		},
+		{
+			"id": "34c19772-105d-494f-b8cd-a27ca04a1e5b",
+			"name": "[9] GET Consultar Consentimento (Verificar Status)",
+			"url": " http://localhost:3000/openfinance/consents/con_005",
+			"time": 38,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200 OK": true,
+				"Status ainda é 'AUTHORIZED'": true,
+				"ID do cliente está correto": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200 OK": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Status ainda é 'AUTHORIZED'": {
+					"pass": 1,
+					"fail": 0
+				},
+				"ID do cliente está correto": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				38
+			],
+			"allTests": [
+				{
+					"Status code is 200 OK": true,
+					"Status ainda é 'AUTHORIZED'": true,
+					"ID do cliente está correto": true
+				}
+			]
+		},
+		{
+			"id": "3371ae45-51e8-47a3-af1e-69770c72519f",
+			"name": "[10] (SUCESSO) GET Dados do Cliente",
+			"url": " http://localhost:3000/openfinance/customers/cus_012",
+			"time": 73,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200 OK": true,
+				"Retornou dados do cliente": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200 OK": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Retornou dados do cliente": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				73
+			],
+			"allTests": [
+				{
+					"Status code is 200 OK": true,
+					"Retornou dados do cliente": true
+				}
+			]
+		},
+		{
+			"id": "79802778-7d4b-4378-80d5-19f7c07b370a",
+			"name": "[11] (SUCESSO) GET Lista de Contas",
+			"url": " http://localhost:3000/openfinance/customers/cus_012/accounts",
+			"time": 108,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200 OK": true,
+				"Retornou um array de contas": true,
+				"Array contém a conta que criamos": false
+			},
+			"testPassFailCounts": {
+				"Status code is 200 OK": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Retornou um array de contas": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Array contém a conta que criamos": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				108
+			],
+			"allTests": [
+				{
+					"Status code is 200 OK": true,
+					"Retornou um array de contas": true,
+					"Array contém a conta que criamos": false
+				}
+			]
+		},
+		{
+			"id": "5c04270d-7e91-4da2-aad4-d4b70afbb965",
+			"name": "[12] (SUCESSO) GET Saldo (Inicial)",
+			"url": " http://localhost:3000/openfinance/accounts/acc_010/balance",
+			"time": 73,
+			"responseCode": {
+				"code": 403,
+				"name": "Forbidden"
+			},
+			"tests": {
+				"Status code is 200 OK": false,
+				"Retornou o saldo inicial correto (1000)": false
+			},
+			"testPassFailCounts": {
+				"Status code is 200 OK": {
+					"pass": 0,
+					"fail": 1
+				},
+				"Retornou o saldo inicial correto (1000)": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				73
+			],
+			"allTests": [
+				{
+					"Status code is 200 OK": false,
+					"Retornou o saldo inicial correto (1000)": false
+				}
+			]
+		},
+		{
+			"id": "9f73965a-8826-4adc-99f2-d47a090b8032",
+			"name": "[13] POST Criar Transação (Crédito +500)",
+			"url": " http://localhost:3000/openfinance/transactions",
+			"time": 471,
+			"responseCode": {
+				"code": 201,
+				"name": "Created"
+			},
+			"tests": {
+				"Status code is 201 Created": true,
+				"Transação tem _id (ex: txn_001)": true
+			},
+			"testPassFailCounts": {
+				"Status code is 201 Created": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Transação tem _id (ex: txn_001)": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				471
+			],
+			"allTests": [
+				{
+					"Status code is 201 Created": true,
+					"Transação tem _id (ex: txn_001)": true
+				}
+			]
+		},
+		{
+			"id": "db4494e6-c734-41f7-ae1c-43e11e216c88",
+			"name": "[14] (SUCESSO) GET Saldo Final (Lógica de Negócio)",
+			"url": " http://localhost:3000/openfinance/accounts/acc_010/balance",
+			"time": 73,
+			"responseCode": {
+				"code": 403,
+				"name": "Forbidden"
+			},
+			"tests": {
+				"Status code is 200 OK": false,
+				"Retornou o saldo final correto (1500)": false
+			},
+			"testPassFailCounts": {
+				"Status code is 200 OK": {
+					"pass": 0,
+					"fail": 1
+				},
+				"Retornou o saldo final correto (1500)": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				73
+			],
+			"allTests": [
+				{
+					"Status code is 200 OK": false,
+					"Retornou o saldo final correto (1500)": false
+				}
+			]
+		},
+		{
+			"id": "14047c60-b89e-456d-bdd2-ac05caa6729e",
+			"name": "[15] (SUCESSO) GET Transações (Lista)",
+			"url": " http://localhost:3000/openfinance/transactions/acc_010",
+			"time": 73,
+			"responseCode": {
+				"code": 403,
+				"name": "Forbidden"
+			},
+			"tests": {
+				"Status code is 200 OK": false,
+				"Retornou um array com 1 transação": false
+			},
+			"testPassFailCounts": {
+				"Status code is 200 OK": {
+					"pass": 0,
+					"fail": 1
+				},
+				"Retornou um array com 1 transação": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				73
+			],
+			"allTests": [
+				{
+					"Status code is 200 OK": false,
+					"Retornou um array com 1 transação": false
+				}
+			]
+		},
+		{
+			"id": "67b70abf-6dca-4c1e-a862-4d422aa56224",
+			"name": "[16] DELETE Revogar Consentimento",
+			"url": " http://localhost:3000/openfinance/consents/con_005",
+			"time": 40,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 204 No Content": false
+			},
+			"testPassFailCounts": {
+				"Status code is 204 No Content": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				40
+			],
+			"allTests": [
+				{
+					"Status code is 204 No Content": false
+				}
+			]
+		},
+		{
+			"id": "e8ef194c-9000-412d-a8e1-c25e59a5dfe4",
+			"name": "[17] GET Consultar Consentimento (Verificar Status)",
+			"url": " http://localhost:3000/openfinance/consents/con_005",
+			"time": 37,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200 OK": true,
+				"Status agora é 'REVOKED'": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200 OK": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Status agora é 'REVOKED'": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				37
+			],
+			"allTests": [
+				{
+					"Status code is 200 OK": true,
+					"Status agora é 'REVOKED'": true
+				}
+			]
+		},
+		{
+			"id": "ad030513-9a87-41c2-8f90-6904eaf00935",
+			"name": "[18] (FALHA) GET Saldo (Após Revogar)",
+			"url": " http://localhost:3000/openfinance/accounts/acc_010/balance",
+			"time": 72,
+			"responseCode": {
+				"code": 403,
+				"name": "Forbidden"
+			},
+			"tests": {
+				"Status code is 403 Forbidden": true,
+				"Erro de consentimento ativo": false
+			},
+			"testPassFailCounts": {
+				"Status code is 403 Forbidden": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Erro de consentimento ativo": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				72
+			],
+			"allTests": [
+				{
+					"Status code is 403 Forbidden": true,
+					"Erro de consentimento ativo": false
+				}
+			]
+		},
+		{
+			"id": "eef69228-8e7f-4c38-b7ee-8346a5b330b9",
+			"name": "[19] (FALHA) GET Lista de Contas (Após Revogar)",
+			"url": " http://localhost:3000/openfinance/customers/cus_012/accounts",
+			"time": 73,
+			"responseCode": {
+				"code": 403,
+				"name": "Forbidden"
+			},
+			"tests": {
+				"Status code is 403 Forbidden": true,
+				"Erro de consentimento ativo": false
+			},
+			"testPassFailCounts": {
+				"Status code is 403 Forbidden": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Erro de consentimento ativo": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				73
+			],
+			"allTests": [
+				{
+					"Status code is 403 Forbidden": true,
+					"Erro de consentimento ativo": false
+				}
+			]
+		}
+	],
+	"count": 1,
+	"totalTime": 2034,
+	"collection": {
+		"requests": [
+			{
+				"id": "ea100679-bd1c-4fca-97c3-a059037c5d5b",
+				"method": "GET"
+			},
+			{
+				"id": "0fe08875-2c22-48b1-b2ff-7df786daa336",
+				"method": "POST"
+			},
+			{
+				"id": "aba2066d-35e1-4c7c-a9a3-0b7fead59bb7",
+				"method": "POST"
+			},
+			{
+				"id": "b5ac6d98-5e80-4f05-b622-1adffd465a45",
+				"method": "GET"
+			},
+			{
+				"id": "3bcb0c49-98dc-48f7-bfe8-ae34a32f2d08",
+				"method": "GET"
+			},
+			{
+				"id": "23a2e6fe-2578-4155-938b-8750ca7496bd",
+				"method": "GET"
+			},
+			{
+				"id": "6709bc34-84c7-4851-b11f-09125002be3b",
+				"method": "GET"
+			},
+			{
+				"id": "f94dcfa6-3542-4f09-92ed-9e684a3f06a6",
+				"method": "POST"
+			},
+			{
+				"id": "34c19772-105d-494f-b8cd-a27ca04a1e5b",
+				"method": "GET"
+			},
+			{
+				"id": "3371ae45-51e8-47a3-af1e-69770c72519f",
+				"method": "GET"
+			},
+			{
+				"id": "79802778-7d4b-4378-80d5-19f7c07b370a",
+				"method": "GET"
+			},
+			{
+				"id": "5c04270d-7e91-4da2-aad4-d4b70afbb965",
+				"method": "GET"
+			},
+			{
+				"id": "9f73965a-8826-4adc-99f2-d47a090b8032",
+				"method": "POST"
+			},
+			{
+				"id": "db4494e6-c734-41f7-ae1c-43e11e216c88",
+				"method": "GET"
+			},
+			{
+				"id": "14047c60-b89e-456d-bdd2-ac05caa6729e",
+				"method": "GET"
+			},
+			{
+				"id": "67b70abf-6dca-4c1e-a862-4d422aa56224",
+				"method": "DELETE"
+			},
+			{
+				"id": "e8ef194c-9000-412d-a8e1-c25e59a5dfe4",
+				"method": "GET"
+			},
+			{
+				"id": "ad030513-9a87-41c2-8f90-6904eaf00935",
+				"method": "GET"
+			},
+			{
+				"id": "eef69228-8e7f-4c38-b7ee-8346a5b330b9",
+				"method": "GET"
+			}
+		]
+	}
+}

@@ -50,8 +50,9 @@ router.post('/', async (req, res) => {
       customerId: consent.customer_id,
       permissions: consent.permissions,
       status: consent.status,
-      expirationDateTime: consent.expiration_date, // Compatibilidade com testes
+      expirationDateTime: consent.expiration_date,
       expirationDate: consent.expiration_date,
+      expiresAt: consent.expiration_date, // Compatibilidade adicional com testes
       createdAt: consent.created_at
     });
   } catch (error) {
