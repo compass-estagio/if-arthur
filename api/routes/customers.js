@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { createCustomer, findCustomerByCpf } = require('../db/customers');
+const { createCustomer, findCustomerByCpf, findCustomerById } = require('../db/customers');
+const { getAccountsByCustomerId } = require('../db/accounts');
 const { generateCustomerId } = require('../utils/idGenerator');
+const { validateConsent } = require('../middleware/consentValidation');
 
 /**
  * GET /customers/lookup/by-cpf/:cpf
@@ -35,6 +37,105 @@ router.get('/lookup/by-cpf/:cpf', async (req, res) => {
     });
   } catch (error) {
     console.error('Erro ao buscar cliente por CPF:', error);
+    res.status(500).json({
+      error: 'Erro interno ao buscar cliente.'
+    });
+  }
+});
+
+/**
+ * GET /customers/:customerId/accounts
+ * Lista todas as contas de um cliente específico
+ * Requer consentimento válido
+ * IMPORTANTE: Esta rota deve vir ANTES de /:customerId para evitar conflito
+ */
+router.get('/:customerId/accounts', async (req, res) => {
+  try {
+    const { customerId } = req.params;
+
+    // Verificar se o cliente existe
+    const customer = await findCustomerById(customerId);
+    if (!customer) {
+      return res.status(404).json({
+        error: 'Cliente não encontrado.'
+      });
+    }
+
+    // Verificar consentimento do cliente
+    const { findActiveConsentByCustomerId } = require('../db/consents');
+    const activeConsent = await findActiveConsentByCustomerId(customerId);
+
+    if (!activeConsent) {
+      return res.status(403).json({
+        error: 'CONSENT_REQUIRED',
+        message: 'Acesso negado: Cliente não possui consentimento válido para compartilhamento de dados.',
+        customerId: customerId,
+        details: 'É necessário criar um consentimento autorizado e não expirado para acessar estes dados.'
+      });
+    }
+
+    // Buscar todas as contas do cliente
+    const accounts = await getAccountsByCustomerId(customerId);
+
+    // Formatar resposta
+    const response = accounts.map(account => ({
+      _id: account.id,
+      type: account.type,
+      branch: account.branch,
+      number: account.number,
+      balance: account.balance
+    }));
+
+    res.json(response);
+  } catch (error) {
+    console.error('Erro ao listar contas do cliente:', error);
+    res.status(500).json({
+      error: 'Erro interno ao listar contas.'
+    });
+  }
+});
+
+/**
+ * GET /customers/:customerId
+ * Retorna os dados de um cliente específico
+ * Requer consentimento válido
+ * IMPORTANTE: Esta rota deve vir DEPOIS de /:customerId/accounts
+ */
+router.get('/:customerId', async (req, res) => {
+  try {
+    const { customerId } = req.params;
+
+    // Verificar se o cliente existe
+    const customer = await findCustomerById(customerId);
+    if (!customer) {
+      return res.status(404).json({
+        error: 'Cliente não encontrado.'
+      });
+    }
+
+    // Verificar consentimento do cliente
+    const { findActiveConsentByCustomerId } = require('../db/consents');
+    const activeConsent = await findActiveConsentByCustomerId(customerId);
+
+    if (!activeConsent) {
+      return res.status(403).json({
+        error: 'CONSENT_REQUIRED',
+        message: 'Acesso negado: Cliente não possui consentimento válido para compartilhamento de dados.',
+        customerId: customerId,
+        details: 'É necessário criar um consentimento autorizado e não expirado para acessar estes dados.'
+      });
+    }
+
+    // Retornar dados do cliente (sem contas por enquanto)
+    res.json({
+      _id: customer.id,
+      name: customer.name,
+      cpf: customer.cpf,
+      email: customer.email,
+      consentGiven: customer.consent_given
+    });
+  } catch (error) {
+    console.error('Erro ao buscar dados do cliente:', error);
     res.status(500).json({
       error: 'Erro interno ao buscar cliente.'
     });
